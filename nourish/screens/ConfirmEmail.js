@@ -6,22 +6,19 @@ import CustomButton from '../components/CustomButton';
  
 
 
-const Login = (props) => {
+const ConfirmEmail = (props) => {
 return (
   <View>
   <ScrollView contentContainerStyle={styles.scrollViewContent}>
   <KeyboardAvoidingView style={styles.container}>
 
-    <Image style={styles.illustration} source={require('../assets/illustrations/login.png')}/>
+    <Image style={styles.illustration} source={require('../assets/illustrations/holding.png')}/>
     
-    <Text style={[styles.text , styles.title]}>Welcome back{'\n'}<Text style={[styles.text , styles.subtitle]}>sign in to access your account</Text></Text>
+    <Text style={[styles.text , styles.title]}>Confirm Email{'\n'}<Text style={[styles.text , styles.subtitle]}>verify your email address</Text></Text>
       
-      <CustomInput placeholder='email' icon='email-outline' style={{width:'100%'}}/>
-      <CustomInput placeholder='password' icon='lock-outline' style={{width:'100%'}}  password/>
-      <Text>Forgot password?</Text>
-      <CustomButton  title='Continue with Google' style={{width:'100%', height:50 , borderRadius:20, backgroundColor:'white', borderWidth:1, borderColor:'#000', borderStyle:'solid'} } iconsize={25} iconcolor={'black'} textstyle={{color:'black', fontSize:20 , marginRight:20}} icon='google' onPress={() => {console.log('button-press');}}/>
+    <CustomInput placeholder='confirmation code' icon='dots-horizontal' style={{width:'100%'}}/>
+    <Text>Resend confirmation code</Text>
       <CustomButton  title='Next' style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={() => {console.log('button-press');}}/>
-      <Text style={styles.text}>New Member? Register now</Text>
     </KeyboardAvoidingView>
     </ScrollView>
     </View>
@@ -30,8 +27,8 @@ return (
 
 const styles = StyleSheet.create({
     illustration:{
-      width:152,
-      height:172
+      width:198,
+      height:204
     },
     container:{
       padding:30,
@@ -47,11 +44,13 @@ const styles = StyleSheet.create({
     },
     title:{
       fontFamily:'Montserrat-bold',
-      fontSize:30
+      fontSize:30,
+      textAlign:'center'
     },
     subtitle:{
       fontSize:15,
-      fontFamily:'Montserrat-regular'
+      fontFamily:'Montserrat-regular',
+      textAlign:'center'
     },
     scrollViewContent: {
       flexGrow: 1,
@@ -59,4 +58,4 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
   });
-export default Login
+export default ConfirmEmail
