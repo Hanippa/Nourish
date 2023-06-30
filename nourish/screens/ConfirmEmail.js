@@ -1,4 +1,4 @@
-import {Text , View , Button, Image ,  KeyboardAvoidingView , ScrollView} from 'react-native'
+import {Text , View , Button, Image ,  KeyboardAvoidingView , ScrollView , TouchableOpacity} from 'react-native'
 import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import CustomInput from '../components/CustomInput';
@@ -7,6 +7,16 @@ import CustomButton from '../components/CustomButton';
 
 
 const ConfirmEmail = (props) => {
+
+
+  const handleResendConfimation = () => {
+    console.log('resend confimation code');
+  }
+  const handleConfirm = () => {
+    console.log('confirm code');
+  }
+
+
 return (
   <View>
   <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -17,8 +27,8 @@ return (
     <Text style={[styles.text , styles.title]}>Confirm Email{'\n'}<Text style={[styles.text , styles.subtitle]}>verify your email address</Text></Text>
       
     <CustomInput placeholder='confirmation code' icon='dots-horizontal' style={{width:'100%'}}/>
-    <Text>Resend confirmation code</Text>
-      <CustomButton  title='Next' style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={() => {console.log('button-press');}}/>
+    <TouchableOpacity onPress={handleResendConfimation}><Text>Resend confirmation code</Text></TouchableOpacity>
+      <CustomButton  title='Next' style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleConfirm}/>
     </KeyboardAvoidingView>
     </ScrollView>
     </View>

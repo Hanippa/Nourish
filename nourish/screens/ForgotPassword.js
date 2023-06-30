@@ -7,6 +7,11 @@ import CustomButton from '../components/CustomButton';
 
 
 const ForgotPassword = (props) => {
+
+  const handleReset = () => {
+    console.log('send reset confimation code');
+  }
+
 return (
   <View>
   <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -17,7 +22,7 @@ return (
     <Text style={[styles.text , styles.title]}>Forgot password{'\n'}<Text style={[styles.text , styles.subtitle]}>reset your password</Text></Text>
       
       <CustomInput placeholder='email' icon='email-outline' style={{width:'100%'}}/>
-      <CustomButton  title='Next' style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={() => {console.log('button-press');}}/>
+      <CustomButton  title='Next' style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleReset}/>
     </KeyboardAvoidingView>
     </ScrollView>
     </View>

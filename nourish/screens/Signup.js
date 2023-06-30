@@ -1,12 +1,51 @@
-import {Text , View , Button, Image ,  KeyboardAvoidingView , ScrollView} from 'react-native'
-import React, { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import {Text , View , Button, Image ,  KeyboardAvoidingView , ScrollView , TouchableOpacity} from 'react-native'
+import React, { useEffect , useState } from 'react';
+import { StyleSheet , Alert } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
- 
+import {useForm , Controller} from 'react-hook-form'
+
+import Parse from "parse/react-native.js";
 
 
-const Signup = (props) => {
+const Signup = ({navigation}) => {
+
+
+  const [signingUp , setSigningUp] = useState(false)
+
+  const {control , handleSubmit} = useForm()
+
+  const handleGoogle = () => {
+    console.log('register with google');
+  }
+
+
+  const handleRegister = async (data) => {
+    if (signingUp) {
+      throw new Error('Already in the process of signing up');
+    }
+  
+    setSigningUp(true);
+    const nameValue = data.name;
+    const emailValue = data.email;
+    const passwordValue = data.password;
+  
+    try {
+      const createdUser = await Parse.User.signUp(emailValue, passwordValue, { name: nameValue , email:emailValue });
+      Alert.alert(
+        'Success!',
+        `User ${createdUser.getUsername()} was successfully created!`,
+      );
+      await Parse.User.logOut();
+      setSigningUp(false);
+      return true;
+    } catch (error) {
+      Alert.alert('Error!', error.message);
+      setSigningUp(false);
+      return false;
+    }
+  };
+
 return (
   <View>
   <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -16,13 +55,13 @@ return (
     
     <Text style={[styles.text , styles.title]}>Get Started{'\n'}<Text style={[styles.text , styles.subtitle]}>by creating a free account</Text></Text>
      
-      <CustomInput placeholder='name' icon='account-outline' style={{width:'100%'}}/>
-      <CustomInput placeholder='email' icon='email-outline' style={{width:'100%'}}/>
-      <CustomInput placeholder='password' icon='lock-outline' style={{width:'100%'}}  password/>
-      <Text>Forgot password?</Text>
-      <CustomButton  title='Continue with Google' style={{width:'100%', height:50 , borderRadius:20, backgroundColor:'white', borderWidth:1, borderColor:'#000', borderStyle:'solid'} } iconsize={25} iconcolor={'black'} textstyle={{color:'black', fontSize:20 , marginRight:20}} icon='google' onPress={() => {console.log('button-press');}}/>
-      <CustomButton  title='Next' style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={() => {console.log('button-press');}}/>
-      <Text style={styles.text}>Already a Member? Login now</Text>
+      <CustomInput rules={{maxLength : {value: 12 , message: 'the name is too long 😰'} , required:'name is required' , minLength : {value: 3 , message: 'the minimum name length is 3 😊'}}} name='name' control={control} placeholder='name' icon='account-outline' style={{width:'100%'}}/>
+      <CustomInput rules={{maxLength : {value: 30 , message: 'the email is too long 😰'} ,required:'email is required' , pattern: {message: 'Please enter a valid email address 🥺',value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/}}} name='email'control={control}  placeholder='email' icon='email-outline' style={{width:'100%'}}/>
+      <CustomInput rules={{maxLength : {value: 24 , message: 'the password is too long 😰'} ,required:'password is required' , minLength : {value:6 , message: 'the minimum password length is 6 🤬'}}} name='password' control={control} placeholder='password' icon='lock-outline' style={{width:'100%'}}  password/>
+      
+      <CustomButton  title='Continue with Google' style={{width:'100%', height:50 , borderRadius:20, backgroundColor:'white', borderWidth:1, borderColor:'#000', borderStyle:'solid'} } iconsize={25} iconcolor={'black'} textstyle={{color:'black', fontSize:20 , marginRight:20}} icon='google' onPress={handleGoogle}/>
+      <CustomButton  title={!signingUp ? 'Next' : 'Loading...'} style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleSubmit(handleRegister)}/>
+      < TouchableOpacity onPress={() => navigation.navigate('Login')}><Text style={styles.text}>Already a Member? Login now</Text></TouchableOpacity>
     </KeyboardAvoidingView>
     </ScrollView>
     </View>
@@ -35,12 +74,13 @@ const styles = StyleSheet.create({
       height:182
     },
     container:{
+      paddingTop:50,
       padding:30,
       gap:20,
       width:"100%",
       height:"100%",
       alignItems:"center",
-      justifyContent:"space-around"
+      justifyContent:"space-around",
       
     },
     text:{
@@ -58,6 +98,7 @@ const styles = StyleSheet.create({
       flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
+
     },
   });
 export default Signup
