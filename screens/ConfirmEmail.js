@@ -26,7 +26,7 @@ return (
     
     <Text style={[styles.text , styles.title]}>Confirm Email{'\n'}<Text style={[styles.text , styles.subtitle]}>verify your email address</Text></Text>
       
-    <CustomInput placeholder='confirmation code' icon='dots-horizontal' style={{width:'100%'}}/>
+    <CustomInput rules={{maxLength : {value: 30 , message: 'the email is too long 😰'} ,required:'email is required' , pattern: {message: 'Please enter a valid email address 🥺',value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/}}} name='email'control={control}  placeholder='email' icon='email-outline' style={{width:'100%'}}/>
     <TouchableOpacity onPress={handleResendConfimation}><Text>Resend confirmation code</Text></TouchableOpacity>
       <CustomButton  title='Next' style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleConfirm}/>
     </KeyboardAvoidingView>

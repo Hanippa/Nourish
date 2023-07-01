@@ -1,3 +1,5 @@
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {  StyleSheet, Text, View } from 'react-native';
 const Home = () => {
     return (

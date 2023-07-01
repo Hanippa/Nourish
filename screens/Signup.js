@@ -4,14 +4,13 @@ import { StyleSheet , Alert } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import {useForm , Controller} from 'react-hook-form'
-
-import Parse from "parse/react-native.js";
+import { createUserWithEmailAndPassword , updateProfile } from "firebase/auth";
+import { auth } from '../firebase';
 
 
 const Signup = ({navigation}) => {
 
 
-  const [signingUp , setSigningUp] = useState(false)
 
   const {control , handleSubmit} = useForm()
 
@@ -20,31 +19,31 @@ const Signup = ({navigation}) => {
   }
 
 
-  const handleRegister = async (data) => {
-    if (signingUp) {
-      throw new Error('Already in the process of signing up');
-    }
+  const handleRegister = (data) => {
+    console.log('handle register!');
+    const name = data.name;
+    const email = data.email;
+    const password = data.password;
   
-    setSigningUp(true);
-    const nameValue = data.name;
-    const emailValue = data.email;
-    const passwordValue = data.password;
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log('Registered with:', user.email);
   
-    try {
-      const createdUser = await Parse.User.signUp(emailValue, passwordValue, { name: nameValue , email:emailValue });
-      Alert.alert(
-        'Success!',
-        `User ${createdUser.getUsername()} was successfully created!`,
-      );
-      await Parse.User.logOut();
-      setSigningUp(false);
-      return true;
-    } catch (error) {
-      Alert.alert('Error!', error.message);
-      setSigningUp(false);
-      return false;
-    }
+        // Update the user's display name
+        updateProfile(user, { displayName: name })
+          .then(() => {
+            console.log('Display name updated:', name);
+          })
+          .catch((error) => {
+            console.log('Error updating display name:', error);
+          });
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
+
 
 return (
   <View>
@@ -60,7 +59,7 @@ return (
       <CustomInput rules={{maxLength : {value: 24 , message: 'the password is too long 😰'} ,required:'password is required' , minLength : {value:6 , message: 'the minimum password length is 6 🤬'}}} name='password' control={control} placeholder='password' icon='lock-outline' style={{width:'100%'}}  password/>
       
       <CustomButton  title='Continue with Google' style={{width:'100%', height:50 , borderRadius:20, backgroundColor:'white', borderWidth:1, borderColor:'#000', borderStyle:'solid'} } iconsize={25} iconcolor={'black'} textstyle={{color:'black', fontSize:20 , marginRight:20}} icon='google' onPress={handleGoogle}/>
-      <CustomButton  title={!signingUp ? 'Next' : 'Loading...'} style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleSubmit(handleRegister)}/>
+      <CustomButton  title={'Next'} style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleSubmit(handleRegister)}/>
       < TouchableOpacity onPress={() => navigation.navigate('Login')}><Text style={styles.text}>Already a Member? Login now</Text></TouchableOpacity>
     </KeyboardAvoidingView>
     </ScrollView>

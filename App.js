@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback } from 'react'
+import React, { useCallback , useState, useEffect } from 'react'
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -13,16 +13,8 @@ import Home from './screens/Home';
 
 import { NavigationContainer , DefaultTheme} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import Parse from "parse/react-native.js";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import 'react-native-get-random-values';
-import { v4 as uuidv4 } from 'uuid';
-
-
-
-
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase';
 
 
 
@@ -30,8 +22,39 @@ const Stack = createNativeStackNavigator();
 
 
 
+const AuthenticationStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="Login">
+      <Stack.Screen options={{ headerShown: false }} name="Signup" component={Signup} />
+      <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
+      <Stack.Screen options={{ headerShown: false }} name="ForgotPassword" component={ForgotPassword} />
+    </Stack.Navigator>
+  );
+};
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen options={{ headerShown: true }} name="Home" component={Home} />
+    </Stack.Navigator>
+  );
+};
+
+
+
 
 export default function App() {
+
+  const [userSignedIn, setUserSignedIn] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUserSignedIn(!!user);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
 
 
   const MyTheme = {
@@ -59,18 +82,17 @@ export default function App() {
     return null;
   }
 
-  Parse.setAsyncStorage(AsyncStorage);
-  
-  Parse.initialize('5iSrL1QAKMBfroFmcDAosgHP7p1rMJa3jo0kIm03','d7r7oZKtovG5cv2TIZHv8hO7HCZctdhOJi5pjUIa');
-  Parse.serverURL = 'https://parseapi.back4app.com/';
-  SplashScreen.preventAutoHideAsync();
+  SplashScreen.preventAutoHideAsync(); 
   return (
     <NavigationContainer theme={MyTheme}>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen options={{headerShown:false}} name="Signup" component={Signup} />
-        <Stack.Screen options={{headerShown:false}} name="Login" component={Login} />
-        <Stack.Screen options={{headerShown:true}} name="Home" component={Home} />
-      </Stack.Navigator>
+      {userSignedIn ? <HomeStack /> : <AuthenticationStack />}
     </NavigationContainer>
   );
 }
+
+
+
+
+
+
+

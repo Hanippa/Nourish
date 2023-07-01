@@ -4,42 +4,52 @@ import { StyleSheet , Alert } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import {useForm , Controller} from 'react-hook-form'
-import Parse from "parse/react-native.js";
+import { auth } from '../firebase';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { signInWithEmailAndPassword , updateProfile } from "firebase/auth";
+
 
 const Login = ({navigation}) => {
   const {control , handleSubmit , formState : {errors}} = useForm()
-  const [loggingIn , setLoggingIn] = useState(false)
 
-  const handleGoogle = () => {
-    console.log('login with google');
-  }
-  const handleLogin = async (data) => {
-    if (loggingIn) {
-      return false;
-    }
-  
-    setLoggingIn(true);
-    const emailValue = data.email;
-    const passwordValue = data.password;
-  
+  useEffect(() => {
+    GoogleSignin.configure({
+      // Configure the webClientId and other options as needed
+      webClientId: '1:890009830241:web:02187c694cf193ac62bb20',
+      offlineAccess: true,
+      forceCodeForRefreshToken: true,
+    });
+  }, []);
+
+  const handleGoogle = async () => {
     try {
-      const loggedInUser = await Parse.User.logIn(emailValue, passwordValue);
-      setLoggingIn(false);
-      Alert.alert(
-        'Success!',
-        `User ${loggedInUser.get('name')} has successfully signed in!`,
-      );
-      const currentUser = await Parse.User.currentAsync();
-      console.log(loggedInUser === currentUser);
-      return true;
-    } catch (error) {
-      setLoggingIn(false);
-      Alert.alert('Error!', error.message);
-      return false;
-    }
-  };
-  
+      await GoogleSignin.hasPlayServices();
+      const { idToken } = await GoogleSignin.signIn();
 
+      // Use the obtained idToken to sign up with Firebase
+      const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+      await firebase.auth().createUserWithCredential(credential);
+
+      // New user is signed up
+      console.log('Google Sign-Up success');
+    } catch (error) {
+      console.log('Google Sign-Up error:', error);
+    }
+  }
+  const handleLogin = (data) => {
+    console.log('handle signin!');
+    const email = data.email;
+    const password = data.password;
+  
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log('Logged in as:', user.email);
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
 return (
   <View >
   <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -51,9 +61,9 @@ return (
       
     <CustomInput rules={{maxLength : {value: 30 , message: 'the email is too long 😰'} ,required:'email is required' , pattern: {message: 'Please enter a valid email address 🥺',value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/}}} name='email'control={control}  placeholder='email' icon='email-outline' style={{width:'100%'}}/>
     <CustomInput rules={{maxLength : {value: 24 , message: 'the password is too long 😰'} ,required:'password is required' , minLength : {value:6 , message: 'the minimum password length is 6 🤬'}}} name='password' control={control} placeholder='password' icon='lock-outline' style={{width:'100%'}}  password/>
-      < TouchableOpacity onPress={() => {console.log('go-to-forgot-password-page')}}><Text>Forgot password?</Text></ TouchableOpacity>
-      <CustomButton title='Continue with Google' style={{width:'100%', height:50 , borderRadius:20, backgroundColor:'white', borderWidth:1, borderColor:'#000', borderStyle:'solid'} } iconsize={25} iconcolor={'black'} textstyle={{color:'black', fontSize:20 , marginRight:20}} icon='google' />
-      <CustomButton  title={!loggingIn ? 'Next' : 'Loading...'} style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleSubmit(handleLogin)}/>
+      < TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}><Text>Forgot password?</Text></ TouchableOpacity>
+      <CustomButton onPress={handleGoogle} title='Continue with Google' style={{width:'100%', height:50 , borderRadius:20, backgroundColor:'white', borderWidth:1, borderColor:'#000', borderStyle:'solid'} } iconsize={25} iconcolor={'black'} textstyle={{color:'black', fontSize:20 , marginRight:20}} icon='google' />
+      <CustomButton  title={'Next'} style={{width:'100%', height:60, backgroundColor:'#F38C79' , borderRadius:20} } iconstyle={{marginTop:4}} iconcolor={'white'} textstyle={{color:'white'}}  icon='chevron-right' iconsize={34} onPress={handleSubmit(handleLogin)}/>
       <TouchableOpacity onPress={() => navigation.navigate('Signup')}><Text style={styles.text}>New Member? Register now</Text></TouchableOpacity>
     </KeyboardAvoidingView>
     </ScrollView>
