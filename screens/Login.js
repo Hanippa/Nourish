@@ -5,37 +5,18 @@ import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import {useForm , Controller} from 'react-hook-form'
 import { auth } from '../firebase';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { signInWithEmailAndPassword , updateProfile } from "firebase/auth";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({navigation}) => {
   const {control , handleSubmit , formState : {errors}} = useForm()
 
-  useEffect(() => {
-    GoogleSignin.configure({
-      // Configure the webClientId and other options as needed
-      webClientId: '1:890009830241:web:02187c694cf193ac62bb20',
-      offlineAccess: true,
-      forceCodeForRefreshToken: true,
-    });
-  }, []);
+
 
   const handleGoogle = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const { idToken } = await GoogleSignin.signIn();
+    console.log('fuck me')
+  };
 
-      // Use the obtained idToken to sign up with Firebase
-      const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-      await firebase.auth().createUserWithCredential(credential);
-
-      // New user is signed up
-      console.log('Google Sign-Up success');
-    } catch (error) {
-      console.log('Google Sign-Up error:', error);
-    }
-  }
   const handleLogin = (data) => {
     console.log('handle signin!');
     const email = data.email;

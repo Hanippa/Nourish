@@ -1,8 +1,9 @@
 // Import the functions you need from the SDKs you need
 
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { browserLocalPersistence , setPersistence , Persistence, browserSessionPersistence , inMemoryPersistence } from "firebase/auth";
+import {  initializeAuth} from "firebase/auth";
+import { getReactNativePersistence } from "firebase/auth/react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 // TODO: Add SDKs for Firebase products that you want to use
 
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -37,7 +38,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app)
+
+const auth = initializeAuth(app)
+
+export {auth};
 
 // setPersistence(auth, browserLocalPersistence)
 //   .then(() => {
@@ -46,4 +50,3 @@ const auth = getAuth(app)
 //   .catch((error) => {
 //     console.log('Error enabling session persistence:', error);
 //   });
-export {auth};

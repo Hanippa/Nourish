@@ -10,15 +10,23 @@ import ForgotPassword from './screens/ForgotPassword';
 import ResetPassword from './screens/ResetPassword';
 import ConfirmEmail from './screens/ConfirmEmail';
 import Home from './screens/Home';
+import Routines from './screens/Routines';
+import Settings from './screens/Settings';
+import Explore from './screens/Explore';
 
 import { NavigationContainer , DefaultTheme} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
 
 
 
@@ -34,9 +42,31 @@ const AuthenticationStack = () => {
 
 const HomeStack = () => {
   return (
-    <Stack.Navigator initialRouteName="Home">
-      <Stack.Screen options={{ headerShown: true }} name="Home" component={Home} />
-    </Stack.Navigator>
+    <Tab.Navigator screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused, color, size }) => {
+        let iconName;
+        if (route.name === 'Home') {
+          iconName = 'home';
+        } else if (route.name === 'Settings') {
+          iconName = 'cog-outline';
+        }
+        else if (route.name === 'Routines'){
+          iconName = 'format-list-text';
+        }
+        else if (route.name === 'Explore'){
+          iconName = 'compass-outline';
+        }
+        return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+      },
+      tabBarActiveTintColor: '#FEA897',
+      tabBarInactiveTintColor: '#FEA89732',
+    })}
+  >
+      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Routines" component={Routines} />
+      <Tab.Screen name="Explore" component={Explore} />
+      <Tab.Screen name="Settings" component={Settings} />
+    </Tab.Navigator>
   );
 };
 
@@ -85,12 +115,10 @@ export default function App() {
   SplashScreen.preventAutoHideAsync(); 
   return (
     <NavigationContainer theme={MyTheme}>
-      {userSignedIn ? <HomeStack /> : <AuthenticationStack />}
+      {!userSignedIn ? <HomeStack /> : <AuthenticationStack />}
     </NavigationContainer>
   );
 }
-
-
 
 
 
