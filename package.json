@@ -13,6 +13,7 @@
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
+    "deprecated-react-native-prop-types": "^4.1.0",
     "expo": "~48.0.18",
     "expo-app-auth": "~11.1.0",
     "expo-auth-session": "~4.0.3",
@@ -23,6 +24,7 @@
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
     "firebase": "^9.23.0",
+    "patch-package": "^7.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.1",
@@ -35,7 +37,8 @@
     "react-native-svg-charts": "^5.4.0",
     "react-native-ui-lib": "^7.5.2",
     "react-native-web": "~0.18.10",
-    "react-native-webview": "11.26.0"
+    "react-native-webview": "11.26.0",
+    "@react-native-community/datetimepicker": "6.7.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
