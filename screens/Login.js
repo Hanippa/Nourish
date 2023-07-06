@@ -14,7 +14,7 @@ const Login = ({navigation}) => {
 
 
   const handleGoogle = async () => {
-    console.log('fuck me')
+    console.log('google login')
   };
 
   const handleLogin = (data) => {

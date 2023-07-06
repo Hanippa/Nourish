@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, FlatList, StyleSheet } from "react-native";
+import { View, Text, ScrollView, FlatList, StyleSheet, Share   } from "react-native";
+import {firestore} from "../firebase"
+import { addDoc ,collection , doc , setDoc } from "firebase/firestore";
 import {
   Card,
   Colors,
@@ -45,6 +47,18 @@ const styles = StyleSheet.create({
 
 const Routines = () => {
 
+
+  const handleExportRoutine = () => {
+    const routineText = `Title: ${selectedRoutine.title}\nProducts: ${selectedRoutine.products}\Notes: ${selectedRoutine.notes}\nDays: ${selectedRoutine.days.join(', ')}\nHours: ${selectedRoutine.hours.map(((hour, index) => {
+                  const text = new Date(hour);
+                  return formatTime(text)}))}`;
+  
+    Share.share({
+      message: routineText,
+    })
+    .then(() => console.log('Routine exported successfully'))
+    .catch((error) => console.log('Error exporting routine:', error));
+  };
   
   const formatTime = (time) => {
     const hours = time.getHours();
@@ -59,7 +73,7 @@ const Routines = () => {
   const [isRoutineModalVisible, setIsRoutineModalVisible] = useState(false);
   const [newRoutine, setNewRoutine] = useState("");
   const [newProducts, setNewProducts] = useState("");
-  const [newFrequency, setNewFrequency] = useState("");
+  const [newNotes, setNewNotes] = useState("");
   const [selectedRoutine, setSelectedRoutine] = useState(null);
   const [routines, setRoutines] = useState([]);
   const [days, setDays] = useState([
@@ -76,6 +90,20 @@ const Routines = () => {
   const [timePickerValue, setTimePickerValue] = useState(new Date());
 
 
+  
+  const handleUploadRoutine = async () => {
+    console.log('handle upload routine');
+    const routineRef = doc(collection(firestore, 'routines'), selectedRoutine.id);
+    await setDoc(routineRef, {
+      id:selectedRoutine.id,
+      title: selectedRoutine.title,
+      products: selectedRoutine.products,
+      notes: selectedRoutine.notes,
+      days: selectedRoutine.days,
+      hours: selectedRoutine.hours,
+      likes: 0,
+    });
+  };
 
 
   const showTimePicker = () => {
@@ -127,7 +155,7 @@ const Routines = () => {
   
       // Filter out the selected routine from the parsed routines array
       const updatedRoutines = parsedRoutines.filter(
-        (routine) => routine.title !== selectedRoutine.title
+        (routine) => routine.id !== selectedRoutine.id
       );
   
       // Save the updated routines array back to AsyncStorage
@@ -160,9 +188,10 @@ const Routines = () => {
   
   const addRoutine = async () => {
     const newRoutineObj = {
+      id:`${newRoutine}${Math.random().toString(16).slice(2)}`,
       title: newRoutine,
       products: newProducts,
-      frequency: newFrequency,
+      notes: newNotes,
       active: true, // Set the initial active status to true
       days: days.filter((day) => day.active).map((day) => day.label),
       hours: selectedHours,
@@ -179,7 +208,7 @@ const Routines = () => {
       setRoutines(parsedRoutines);
       setNewRoutine("");
       setNewProducts("");
-      setNewFrequency("");
+      setNewNotes("");
       setSelectedHours([]); // Clear selected hours after adding routine
       setIsModalVisible(false);
     } catch (error) {
@@ -333,9 +362,9 @@ const Routines = () => {
               containerStyle={{ marginBottom: 20 }}
             />
             <TextField
-              placeholder="Frequency"
-              value={newFrequency}
-              onChangeText={(text) => setNewFrequency(text)}
+              placeholder="Notes"
+              value={newNotes}
+              onChangeText={(text) => setNewNotes(text)}
               containerStyle={{ marginBottom: 20 }}
             />
             <View>
@@ -456,7 +485,7 @@ const Routines = () => {
               </Text>
               <Text>Title: {selectedRoutine.title}</Text>
               <Text>Products: {selectedRoutine.products}</Text>
-              <Text>Frequency: {selectedRoutine.frequency}</Text>
+              <Text>Notes: {selectedRoutine.notes}</Text>
               <Text>
                 {selectedRoutine.days && (
                   <Text>Days: {selectedRoutine.days.join(", ")}</Text>
@@ -464,9 +493,11 @@ const Routines = () => {
               </Text>
               {selectedRoutine.hours && (
                 <Text>Hours: {selectedRoutine.hours.map(((hour, index) => {
-                  const text = Date.parse('04 Dec 1995 00:12:00 GMT');
-                  return <Text key={index}>{text}</Text>}))}</Text>
+                  const text = new Date(hour);
+                  return <Text key={index}>{formatTime(text)} </Text>}))}</Text>
               )}
+              <Button label="Export" onPress={handleExportRoutine} />
+              <Button label="Upload" onPress={handleUploadRoutine} />
               <Button
                 label="Delete"
                 onPress={() => handleDeleteRoutine(selectedRoutine)}

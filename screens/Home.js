@@ -5,16 +5,44 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
   const [activeRoutines, setActiveRoutines] = useState([]);
+  const [todayActiveRoutines , setTodayActiveRoutines] = useState([]);
 
   useEffect(() => {
     // Load active routines from AsyncStorage when the component mounts
     loadActiveRoutines();
+    loadTodayActiveRoutines();
   }, []);
 
   useEffect(() => {
     // Update active routines whenever the activeRoutines state changes
     loadActiveRoutines();
   }, [activeRoutines]);
+
+  // useEffect(() => {
+  //   // Update active routines whenever the activeRoutines state changes
+  //   loadTodayActiveRoutines();
+  // }, [todayActiveRoutines]);
+
+
+
+  const loadTodayActiveRoutines = async () => {
+    try {
+
+        const parsedRoutines = activeRoutines
+        const currentDate = new Date();
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const currentDay = daysOfWeek[currentDate.getDay()];
+        
+        const filteredRoutines = parsedRoutines.filter(
+          (routine) => {
+            console.log(currentDay);
+            return routine.days.includes(currentDay) && routine.active}
+        );
+
+        setTodayActiveRoutines(filteredRoutines);
+    } catch (error) {
+      console.log('Error loading active routines:', error);
+    }}
 
   const loadActiveRoutines = async () => {
     try {
@@ -48,7 +76,19 @@ const Home = () => {
           )}
         </Card>
         <Card style={styles.containerRow}>
-          <Text style={styles.containerText}>Container 2</Text>
+        <View style={styles.container}>
+      <Text style={styles.title}>Active Routines for Today</Text>
+      {todayActiveRoutines.length > 0 ? (
+        todayActiveRoutines.map((routine) => (
+          <View style={styles.routineContainer} key={routine.title}>
+            <Text style={styles.routineTitle}>{routine.title}</Text>
+            <Text style={styles.routineTime}>{routine.hours.join(', ')}</Text>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.noRoutinesText}>No active routines for today.</Text>
+      )}
+    </View>
         </Card>
         <Card style={styles.containerRow}>
           <Text style={styles.containerText}>Container 3</Text>
