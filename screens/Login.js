@@ -4,10 +4,12 @@ import { StyleSheet , Alert } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import {useForm , Controller} from 'react-hook-form'
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword , updateProfile } from "firebase/auth";
+import { auth  } from '../firebase';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
+// const auth = getAuth();
 const Login = ({navigation}) => {
   const {control , handleSubmit , formState : {errors}} = useForm()
 

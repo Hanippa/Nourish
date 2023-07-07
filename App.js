@@ -115,7 +115,7 @@ export default function App() {
   SplashScreen.preventAutoHideAsync(); 
   return (
     <NavigationContainer theme={MyTheme}>
-      {!userSignedIn ? <HomeStack /> : <AuthenticationStack />}
+      {userSignedIn ? <HomeStack /> : <AuthenticationStack />}
     </NavigationContainer>
   );
 }

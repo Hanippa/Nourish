@@ -1,13 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Card, Colors, Typography } from 'react-native-ui-lib';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth, onAuthStateChanged} from "firebase/auth";
+import { app } from '../firebase';
 
+
+
+let user = null;
 const Home = () => {
   const [activeRoutines, setActiveRoutines] = useState([]);
   const [todayActiveRoutines , setTodayActiveRoutines] = useState([]);
 
+  const formatTime = (time) => {
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    const ampm = hours >= 12 ? "pm" : "am";
+    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+    const formattedMinutes = minutes.toString().padStart(2, "0");
+    return `${formattedHours}:${formattedMinutes}${ampm}`;
+  };
+
   useEffect(() => {
+    const auth = getAuth(app)
+user = auth.currentUser;
+
     // Load active routines from AsyncStorage when the component mounts
     loadActiveRoutines();
     loadTodayActiveRoutines();
@@ -27,15 +44,15 @@ const Home = () => {
 
   const loadTodayActiveRoutines = async () => {
     try {
-
-        const parsedRoutines = activeRoutines
+        const storedRoutines = await AsyncStorage.getItem('routines');
+        const parsedRoutines = JSON.parse(storedRoutines);
         const currentDate = new Date();
         const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         const currentDay = daysOfWeek[currentDate.getDay()];
         
         const filteredRoutines = parsedRoutines.filter(
           (routine) => {
-            console.log(currentDay);
+            console.log('routine ->' ,routine);
             return routine.days.includes(currentDay) && routine.active}
         );
 
@@ -82,7 +99,12 @@ const Home = () => {
         todayActiveRoutines.map((routine) => (
           <View style={styles.routineContainer} key={routine.title}>
             <Text style={styles.routineTitle}>{routine.title}</Text>
-            <Text style={styles.routineTime}>{routine.hours.join(', ')}</Text>
+            {routine.hours.map((hour , index) => {
+              time = new Date(hour)
+              return (
+                <Text key={index}>{formatTime(time) }</Text>
+              )
+            })}
           </View>
         ))
       ) : (
@@ -91,7 +113,7 @@ const Home = () => {
     </View>
         </Card>
         <Card style={styles.containerRow}>
-          <Text style={styles.containerText}>Container 3</Text>
+          <Text style={styles.containerText}>{user ? ` user : ${user.displayName}` : 'no user'} </Text>
         </Card>
       </View>
     </ScrollView>

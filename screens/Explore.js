@@ -8,52 +8,117 @@ import { MaterialCommunityIcons , Ionicons } from "@expo/vector-icons";
 import * as Animatable from 'react-native-animatable';
 
 
-
-
-
-    // try {
-    //   const routineRef = doc(firestore, 'routines', routineId);
-    //   await updateDoc(routineRef, { likes: 99 });
-    //   console.log('Routine updated successfully');
-    // } catch (error) {
-    //   console.log('Error updating routine:', error);
-    // }
-      
 const Explore = () => {
+  useEffect(() => {
+
+    loadLikedRoutines();
+
+    fetchRoutines();
+  }, []);
+
+
   const animationRef = React.createRef();
   const animateLike = () => {
     animationRef.current.animate('flipInX');
   };
-  const handleLike = async (routineId) => {
-    setLiked((prevLiked) => !prevLiked);
-    animateLike()
-    try {
-      const routineRef = doc(firestore, 'routines', routineId);
-  
-      // Get the routine document
-      const routineSnapshot = await getDoc(routineRef);
-  
-      // Check if the routine document exists
-      if (routineSnapshot.exists()) {
-        const routineData = routineSnapshot.data();
-        const currentLikes = routineData.likes || 0;
-  
-        // Increment the likes count and update the document
-        await updateDoc(routineRef, { likes: currentLikes + 1 });
-  
-        setRoutines((prevRoutines) =>
-          prevRoutines.map((routine) =>
-            routine.id === routineId ? { ...routine, likes: routine.likes + 1 } : routine
-          )
-        );
-  
-        console.log('Routine liked successfully');
-      } else {
-        console.log('Routine document not found');
+
+  // const handleLikeRoutine = async (routineId) => {
+
+    
+  //   // Check if the routine is already liked
+  //   if (likedRoutines.includes(routineId)) {
+  //     // Routine is already liked, remove it from the liked routines
+  //     const updatedLikedRoutines = likedRoutines.filter((id) => id !== routineId);
+  //     setLikedRoutines(updatedLikedRoutines);
+  //   } else {
+  //     // Routine is not liked, add it to the liked routines
+  //     const updatedLikedRoutines = [...likedRoutines, routineId];
+  //     setLikedRoutines(updatedLikedRoutines);
+  //   }
+
+  //   // Save the updated liked routines to AsyncStorage
+  //   saveLikedRoutines();
+  // };
+  // const isRoutineLiked = (routineId) => {
+  //   return likedRoutines.includes(routineId);
+  // };
+
+  const isRoutineLiked = (routineId) => {
+
+    return likedRoutines.includes(routineId);
+  };
+
+
+  const handleLikeRoutine = async (routineId) => {
+    // Check if the routine is already liked
+    if (likedRoutines.includes(routineId)) {
+      // Routine is already liked, remove it from the liked routines
+      const updatedLikedRoutines = likedRoutines.filter((id) => id !== routineId);
+      setLikedRoutines(updatedLikedRoutines);
+      saveLikedRoutines()
+      try {
+        const routineRef = doc(firestore, 'routines', routineId);
+    
+        // Get the routine document
+        const routineSnapshot = await getDoc(routineRef);
+    
+        // Check if the routine document exists
+        if (routineSnapshot.exists()) {
+          const routineData = routineSnapshot.data();
+          const currentLikes = routineData.likes || 0;
+    
+          // Increment the likes count and update the document
+          await updateDoc(routineRef, { likes: currentLikes > 0 ? currentLikes - 1 : 0});
+    
+          setRoutines((prevRoutines) =>
+            prevRoutines.map((routine) =>
+              routine.id === routineId ? { ...routine, likes: routine.likes > 0 ? routine.likes - 1 : 0} : routine
+            )
+          );
+          console.log('Routine liked successfully');
+        } else {
+          console.log('Routine document not found');
+        }
+      } catch (error) {
+        console.log('Error liking routine:', error);
       }
-    } catch (error) {
-      console.log('Error liking routine:', error);
+
+      
+    } else {
+      // Routine is not liked, add it to the liked routines
+      const updatedLikedRoutines = [...likedRoutines, routineId];
+      setLikedRoutines(updatedLikedRoutines);
+      saveLikedRoutines()
+
+      try {
+        const routineRef = doc(firestore, 'routines', routineId);
+    
+        // Get the routine document
+        const routineSnapshot = await getDoc(routineRef);
+    
+        // Check if the routine document exists
+        if (routineSnapshot.exists()) {
+          const routineData = routineSnapshot.data();
+          const currentLikes = routineData.likes || 0;
+    
+          // Increment the likes count and update the document
+          await updateDoc(routineRef, { likes: currentLikes + 1 });
+    
+          setRoutines((prevRoutines) =>
+            prevRoutines.map((routine) =>
+              routine.id === routineId ? { ...routine, likes: routine.likes + 1 } : routine
+            )
+          );
+    
+          console.log('Routine liked successfully');
+        } else {
+          console.log('Routine document not found');
+        }
+      } catch (error) {
+        console.log('Error liking routine:', error);
+      }
     }
+ 
   };
 
   const formatTime = (time) => {
@@ -90,14 +155,15 @@ const Explore = () => {
       }
     };
     const routinehours = routine.hours.map(hour => {
-      const date = hour.toDate()
+      const date = new Date(hour)
       return formatTime(date)
     })
     return (
       <Modal visible={isVisible} onRequestClose={onClose} animationType="slide">
+        <Ionicons name="close" size={24} color="black" />
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>{routine.title}</Text>
-          <Text style={styles.modalAuthor}>by {routine.author}</Text>
+          <Text style={styles.modalAuthor}>by {routine.by}</Text>
           <Text style={styles.modalText}>{routine.products}</Text>
           <Text style={styles.modalText}>{routine.notes}</Text>
           <Text style={styles.modalText}>Days: {routine.days.join(', ')}</Text>
@@ -110,7 +176,7 @@ const Explore = () => {
             <Text style={styles.savedText}>Routine saved!</Text>
           )}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color="black" />
+            
           </TouchableOpacity>
         </View>
       </Modal>
@@ -122,28 +188,49 @@ const Explore = () => {
   const [likedRoutines, setLikedRoutines] = useState([]);
   const [selectedRoutine, setSelectedRoutine] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(true);
-  const [liked, setLiked] = useState(false);
+
 
   const handleRoutinePress = (routine) => {
+    console.log(typeof(routine) , '=> ' , routine)
     setSelectedRoutine(routine);
     setIsModalVisible(true);
   };
 
   
-  useEffect(() => {
 
 
-    fetchRoutines();
-  }, []);
+  const loadLikedRoutines = async () => {
+    try {
+      const storedLikedRoutines = await AsyncStorage.getItem('likedRoutines');
+      if (storedLikedRoutines) {
+        const parsedLikedRoutines = JSON.parse(storedLikedRoutines);
+        setLikedRoutines(parsedLikedRoutines);
+      }
+    } catch (error) {
+      console.log('Error loading liked routines:', error);
+    }
+  };
+
+  const saveLikedRoutines = async () => {
+    try {
+      await AsyncStorage.setItem('likedRoutines', JSON.stringify(likedRoutines));
+    } catch (error) {
+      console.log('Error saving liked routines:', error);
+    }
+  };
 
   const renderRoutineItem = ({ item }) => {
     return (
       <TouchableOpacity style={styles.routineItem} onPress={() => handleRoutinePress(item)}>
       <Text style={styles.routineTitle}>{item.title}</Text>
-      <Text style={styles.routineAuthor}>by {item.author}</Text>
-      <TouchableOpacity style={styles.likeButton} onPress={() => handleLike(item.id)}>
+      <Text style={styles.routineAuthor}>by {item.by}</Text>
+      <TouchableOpacity style={styles.likeButton} onPress={() => handleLikeRoutine(item.id)}>
       <Animatable.View ref={animationRef}>
-      <MaterialCommunityIcons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? 'red' : 'black'} />
+      <MaterialCommunityIcons
+          name={isRoutineLiked(item.id) ? 'heart' : 'heart-outline'}
+          size={24}
+          color={isRoutineLiked(item.id) ? 'red' : 'black'}
+        />
     </Animatable.View>
         <Text style={styles.likeCount}>{item.likes}</Text>
       </TouchableOpacity>

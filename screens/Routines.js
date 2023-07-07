@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, FlatList, StyleSheet, Share   } from "react-native";
-import {firestore} from "../firebase"
+import {firestore , app} from "../firebase"
+import { getAuth , onAuthStateChanged} from "firebase/auth";
 import { addDoc ,collection , doc , setDoc } from "firebase/firestore";
 import {
   Card,
@@ -44,10 +45,26 @@ const styles = StyleSheet.create({
 });
 
 
-
+let user = null;
 const Routines = () => {
+  useEffect(() => {
+    const auth = getAuth(app)
+    user = auth.currentUser;
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+        const uid = user.uid;
+        // ...
+      } else {
+        // User is signed out
+        // ...
+      }
+    });
+    loadRoutines();
+  }, []);
 
-
+ 
   const handleExportRoutine = () => {
     const routineText = `Title: ${selectedRoutine.title}\nProducts: ${selectedRoutine.products}\Notes: ${selectedRoutine.notes}\nDays: ${selectedRoutine.days.join(', ')}\nHours: ${selectedRoutine.hours.map(((hour, index) => {
                   const text = new Date(hour);
@@ -102,6 +119,7 @@ const Routines = () => {
       days: selectedRoutine.days,
       hours: selectedRoutine.hours,
       likes: 0,
+      by:user ? `${user.displayName}` : 'anonymous'
     });
   };
 
@@ -115,9 +133,7 @@ const Routines = () => {
   };
 
 
-  useEffect(() => {
-    loadRoutines();
-  }, []);
+
 
   const handleHourRemoval = (hour) => {
     console.log(hour);

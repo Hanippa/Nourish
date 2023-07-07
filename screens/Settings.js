@@ -1,10 +1,26 @@
+import { getAuth } from 'firebase/auth';
 import React from 'react';
 import { View, Text, StyleSheet} from 'react-native';
-import { Switch } from 'react-native-ui-lib';
+import { Switch , Button , Colors } from 'react-native-ui-lib';
+import { app } from '../firebase';
 
 const Settings = () => {
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(false);
   const [darkModeEnabled, setDarkModeEnabled] = React.useState(false);
+
+
+  const handleSignOut = () => {
+    const auth = getAuth(app);
+    auth.signOut()
+      .then(() => {
+        // User signed out successfully
+        console.log('User signed out');
+      })
+      .catch((error) => {
+        // Handle errors during sign-out
+        console.error('Sign-out failed:', error);
+      });
+  };
 
   const toggleNotifications = () => {
     setNotificationsEnabled((prevValue) => !prevValue);
@@ -31,6 +47,7 @@ const Settings = () => {
         <Text style={styles.optionText}>Dark Mode</Text>
         <Switch onColor='#F38C79' value={darkModeEnabled} onValueChange={toggleDarkMode} />
       </View>
+      <Button onPress={handleSignOut} label={'Sign out'} size={Button.sizes.medium} backgroundColor={Colors.red30}/>
     </View>
   );
 };
