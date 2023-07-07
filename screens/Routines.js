@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, FlatList, StyleSheet, Share   } from "react-native";
+import { View, Text, ScrollView, FlatList, StyleSheet, Share ,TouchableOpacity ,  KeyboardAvoidingView} from "react-native";
 import {firestore , app} from "../firebase"
 import { getAuth , onAuthStateChanged} from "firebase/auth";
 import { addDoc ,collection , doc , setDoc } from "firebase/firestore";
@@ -14,34 +14,66 @@ import {
   Checkbox,
 } from "react-native-ui-lib";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const styles = StyleSheet.create({
+
   hourContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: "#F0F0F0",
+    backgroundColor: "white",
     borderRadius: 16,
     marginRight: 8,
+    width:'90%',
+    margin:5
   },
   hourText: {
-    fontWeight: "bold",
+    fontFamily:'Montserrat-regular',
+    fontSize:16
   },
   removeButton: {
-    marginLeft: 8,
-    padding: 4,
-    borderRadius: 8,
-    backgroundColor: "#F38C79",
+    position:'absolute',
+    right:0
   },
   removeButtonText: {
     color: "white",
     fontWeight: "bold",
     fontSize: 12,
   },
+  card : {
+    flexDirection:'column',
+    width:'90%',
+    height:200,
+    margin:20,
+    borderRadius:40,
+    borderColor:'#034c530a',
+    borderWidth:2
+  },
+  subcard:{
+    backgroundColor:'#F9F9F9',
+    width:'100%',
+    height:140 ,
+    borderRadius:40
+ },
+ button:{
+
+  height:65,
+  backgroundColor:'#FF5656'
+},
+uploadbutton:{
+  marginBottom:10,
+  height:65,
+  backgroundColor:'#F48D79',
+
+},
+buttonText:{
+  paddingTop:15,
+  fontSize: 30,
+  fontFamily:'Montserrat-regular'
+}
 });
 
 
@@ -203,6 +235,9 @@ const Routines = () => {
 
   
   const addRoutine = async () => {
+    if (newRoutine.length < 3 || newProducts.length < 3 || newNotes <3){
+      return;
+    }
     const newRoutineObj = {
       id:`${newRoutine}${Math.random().toString(16).slice(2)}`,
       title: newRoutine,
@@ -255,7 +290,7 @@ const Routines = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f5f5f5", position: "relative" }}>
+    <View style={{ flex: 1, backgroundColor: "white", position: "relative" }}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -274,7 +309,8 @@ const Routines = () => {
           {routines.map((routine, index) => (
             <Card
               key={index}
-              style={{ width: 150, height: 150, margin: 10, padding: 20 }}
+              style={styles.card}
+              enableShadow={false}
             >
               <TouchableOpacity
                 onPress={() => openRoutineModal(index)}
@@ -282,19 +318,50 @@ const Routines = () => {
                   flex: 1,
                   justifyContent: "center",
                   alignItems: "center",
+                  flexDirection:'column'
                 }}
               >
+                <View style={
+                  {flex:1,
+                  flexDirection:'row',
+                  height:'20%',
+                  width:'100%',
+                  justifyContent:'center'
+                }
+                }>
                 <Text
                   style={{
-                    fontSize: 16,
-                    fontWeight: "bold",
+                    fontSize: 25,
+                    margin:10,
+                    
                     color: routine.active ? "#000000" : "#808080",
+                    fontFamily:'Montserrat-regular',
                   }}
                 >
-                  {routine.title}
+                   {routine.title}
                 </Text>
-              </TouchableOpacity>
-              <View
+                <Switch
+                style={
+                  {
+                    position:'absolute',
+                    right:0,
+                    margin:20,
+                    marginTop:15
+                  }
+                }
+                width={50}
+                height={28}
+                thumbSize={23}
+                  onColor="#FDA898"
+                  offColor="#034c531a"
+                  value={routine.active}
+                  onValueChange={() => toggleRoutineStatus(index)}
+                />
+                </View>
+              
+
+                  <Card key={index} style={styles.subcard} enableShadow={false}>
+                  <View
                 style={{
                   flexDirection: "row",
                   justifyContent: "center",
@@ -302,17 +369,51 @@ const Routines = () => {
                   marginTop: 10,
                 }}
               >
-                <Switch
-                  onColor="#F38C79"
-                  value={routine.active}
-                  onValueChange={() => toggleRoutineStatus(index)}
-                />
+         
+         <Text
+                  style={{
+                    fontSize: 16,
+                    margin:10,
+                    textAlign:'center' ,
+                    color: routine.active ? "#000000" : "#808080",
+                    fontFamily:'Montserrat-regular',
+                  }}
+                >
+                   {routine.notes}
+                </Text>
+               
               </View>
+              
+
+              <Text style={{fontSize:20,position:'absolute' , left:0 , bottom:0, margin:30}}>✨</Text>
+                  </Card>
+              
+                 
+              
+ 
+              
+              
+              </TouchableOpacity>
             </Card>
           ))}
         </View>
       </ScrollView>
-
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          bottom: 20,
+          right: 90,
+          backgroundColor: "#F38C79",
+          width: 60,
+          height: 60,
+          borderRadius: 30,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        onPress={() => loadRoutines()}
+      > 
+        <MaterialCommunityIcons name="refresh" size={24} color='white' />
+      </TouchableOpacity>
       <TouchableOpacity
         style={{
           position: "absolute",
@@ -330,93 +431,94 @@ const Routines = () => {
         <MaterialCommunityIcons name="plus" size={24} color={Colors.white} />
       </TouchableOpacity>
 
+
+
+
+
+
+
+
       <Modal
         visible={isModalVisible}
         onRequestClose={() => setIsModalVisible(false)}
         animationType="slide"
         transparent
       >
+        <KeyboardAvoidingView style={{height:600, marginTop:100}}>
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: Colors.black70,
           }}
         >
-          <TouchableOpacity
-            style={{ position: "absolute", top: 10, right: 10 }}
-            onPress={() => setIsModalVisible(false)}
-          >
-            <MaterialCommunityIcons
-              name="close"
-              size={24}
-              color={Colors.grey10}
-            />
-          </TouchableOpacity>
+
           <View
             style={{
               width: "80%",
               backgroundColor: Colors.white,
               borderRadius: 10,
               padding: 20,
+              borderRadius:40,
+              borderColor:'#034c530a',
+              borderWidth:2
             }}
           >
-            <Text style={[Typography.text20, { marginBottom: 20 }]}>
-              Add Routine
-            </Text>
+            
+                      <TouchableOpacity
+            style={{ position: "absolute", top: 25, left: 10 }}
+            onPress={() => setIsModalVisible(false)}
+          >
+            <MaterialCommunityIcons
+              name="close"
+              size={50}
+              color='#00000050'
+            />
+          </TouchableOpacity>
+          
+
             <TextField
+            placeholderTextColor={'#00000050'}
               placeholder="Title"
               value={newRoutine}
               onChangeText={(text) => setNewRoutine(text)}
-              containerStyle={{ marginBottom: 20 }}
+              centered
+              containerStyle={{width:'80%', marginLeft:50,marginBottom: 20, backgroundColor:'#F9F9F9' , padding:15 , borderRadius:50 }}
             />
             <TextField
+            centered
+            placeholderTextColor={'#00000050'}
               placeholder="Products"
               value={newProducts}
               onChangeText={(text) => setNewProducts(text)}
-              containerStyle={{ marginBottom: 20 }}
+              containerStyle={{width:'100%', marginBottom: 20, backgroundColor:'#F9F9F9' , padding:15 , borderRadius:50 }}
             />
             <TextField
+            placeholderTextColor={'#00000050'}
+            centered
               placeholder="Notes"
               value={newNotes}
               onChangeText={(text) => setNewNotes(text)}
-              containerStyle={{ marginBottom: 20 }}
+              containerStyle={{width:'100%', marginBottom: 20, backgroundColor:'#F9F9F9' , padding:15 , borderRadius:50 }}
             />
-            <View>
-              <Text>Days:</Text>
-              <View>
-                {days.map((day, index) => (
-                  <Checkbox
-                    color="#F38C79"
-                    key={index}
-                    value={day.active}
-                    onValueChange={() => handleToggleDay(index)}
-                    label={day.label}
-                    style={{margin:2}}
-                  />
-                ))}
-              </View>
-              <View style={{ marginVertical: 10 }}>
-                <Text
-                  style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}
-                >
-                  Add Hours
-                </Text>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View >
+              <View style={{flexDirection:'row'}}>
+              <ScrollView style={{margin:10, height:150,width:'50%', borderRadius:30 , backgroundColor:'#F9F9F9'}}>
+              <View style={{ marginVertical: 10 , width:'100%' , height:'100%'}}>
+                <View style={{ flexDirection: "column", alignItems: "center" , width:'100%'}}>
                   <TouchableOpacity
                     onPress={showTimePicker}
-                    style={{ marginRight: 10 }}
+                    style={{ marginRight: 10 , width:'100%'}}
                   >
                     <MaterialCommunityIcons
                       name="plus-circle-outline"
-                      size={24}
-                      color={Colors.primary}
+                      size={30}
+                      color='#F38C79'
+                      style={{position:'absolute' , top:0 , left:15}}
                     />
+                    <Text style={{fontSize:20,fontFamily:'Montserrat-regular' , alignSelf:'center' , marginTop:2 , marginLeft:35}}>hours</Text>
                   </TouchableOpacity>
-                  {selectedHours.length === 0 ? (
-                    <Text>No hours selected</Text>
-                  ) : (
+                  {(
                     <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                       {selectedHours.map((hour , index) => (
                                   <View style={styles.hourContainer} key={index}>
@@ -424,7 +526,11 @@ const Routines = () => {
                                   <TouchableOpacity
                                     style={styles.removeButton}
                                     onPress={() => handleHourRemoval(hour)}>
-                                    <Text style={styles.removeButtonText}>Remove</Text>
+                                                        <MaterialCommunityIcons
+                                                          name="close-circle-outline"
+                                                          size={30}
+                                                          color='#F38C79'
+                                                        />
                                   </TouchableOpacity>
                                 </View>
                       ))}
@@ -432,14 +538,35 @@ const Routines = () => {
                   )}
                 </View>
               </View>
+              </ScrollView>
+              <ScrollView style={{ margin:10, height:150,width:'50%', borderRadius:30 , backgroundColor:'#F9F9F9'}}>
+              <View style={{justifyContent:'center', alignItems:'center'}}>
+                {days.map((day, index) => (
+                  <Checkbox
+                    color="#F38C79"
+                    key={index}
+                    value={day.active}
+                    onValueChange={() => handleToggleDay(index)}
+                    label={day.label.substring(0 , 3)}
+                    labelStyle={{width:60,fontSize:24 , fontFamily:'Montserrat-regular',}}
+                    style={{margin:2}}
+                  />
+                ))}
+              </View>
+              </ScrollView>
+              </View>
+
             </View>
             <Button
-              label="Add"
+              style={styles.button}
+              labelStyle={styles.buttonText}
+              label="add routine"
               onPress={addRoutine}
               backgroundColor={"#F38C79"}
             />
           </View>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
 
 
@@ -470,58 +597,149 @@ const Routines = () => {
           animationType="slide"
           transparent
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: Colors.black70,
-            }}
-          >
-            <TouchableOpacity
-              style={{ position: "absolute", top: 10, right: 10 }}
-              onPress={() => setIsRoutineModalVisible(false)}
-            >
-              <MaterialCommunityIcons
-                name="close"
-                size={24}
-                color={Colors.grey10}
-              />
-            </TouchableOpacity>
-            <View
-              style={{
-                width: "80%",
-                backgroundColor: Colors.white,
-                borderRadius: 10,
-                padding: 20,
-              }}
-            >
-              <Text style={[Typography.text50, { marginBottom: 20 }]}>
-                Routine Details
-              </Text>
-              <Text>Title: {selectedRoutine.title}</Text>
-              <Text>Products: {selectedRoutine.products}</Text>
-              <Text>Notes: {selectedRoutine.notes}</Text>
-              <Text>
-                {selectedRoutine.days && (
-                  <Text>Days: {selectedRoutine.days.join(", ")}</Text>
-                )}
-              </Text>
-              {selectedRoutine.hours && (
-                <Text>Hours: {selectedRoutine.hours.map(((hour, index) => {
-                  const text = new Date(hour);
-                  return <Text key={index}>{formatTime(text)} </Text>}))}</Text>
-              )}
-              <Button label="Export" onPress={handleExportRoutine} />
-              <Button label="Upload" onPress={handleUploadRoutine} />
-              <Button
-                label="Delete"
-                onPress={() => handleDeleteRoutine(selectedRoutine)}
-                backgroundColor={"#F38C79"}
-              />
-            </View>
-          </View>
-        </Modal>
+              <KeyboardAvoidingView style={{height:600, marginTop:100}}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+      
+                <View
+                  style={{
+                    width: "80%",
+                    backgroundColor: Colors.white,
+                    borderRadius: 10,
+                    padding: 20,
+                    borderRadius:40,
+                    borderColor:'#034c530a',
+                    borderWidth:2
+                  }}
+                >
+                            <TouchableOpacity
+                  style={{ position: "absolute", top: 25, left: 10 }}
+                  onPress={() => setIsRoutineModalVisible(false)}
+                >
+                  <MaterialCommunityIcons
+                    name="close"
+                    size={50}
+                    color='#00000050'
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ position: "absolute", top: 70, left: 10 }}
+                  onPress={handleExportRoutine}
+                >
+                  <MaterialCommunityIcons
+                    name="share-variant-outline"
+                    size={40}
+                    color='#00000050'
+                  />
+                </TouchableOpacity>
+                <Text style={{ width:'80%', marginLeft:50, marginBottom: 20,padding:15 , borderRadius:50 , fontFamily:'Montserrat-regular' , fontSize:30 , textAlign:'center' }}>{selectedRoutine.title}</Text>
+                <Text style={{ textAlign:'center' , fontFamily:'Montserrat-regular' , width:'100%', marginBottom: 20, backgroundColor:'#F9F9F9' , padding:15 , borderRadius:50 }}>{selectedRoutine.notes}</Text>
+                <Text style={{ textAlign:'center' , fontFamily:'Montserrat-regular' , width:'100%', marginBottom: 20, backgroundColor:'#F9F9F9' , padding:15 , borderRadius:50 }}>{selectedRoutine.products}</Text>
+                  <View >
+                    <View style={{flexDirection:'row'}}>
+                    <ScrollView style={{margin:10, height:150,width:'50%', borderRadius:30 , backgroundColor:'#F9F9F9'}}>
+                    <View style={{ marginVertical: 10 , width:'100%' , height:'100%'}}>
+                      <View style={{ flexDirection: "column", alignItems: "center" , width:'100%'}}>
+                        {(
+                          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                            {
+
+                            selectedRoutine.hours.map((hour , index) => {
+                                        const text = new Date(hour);
+                                        return (<View style={styles.hourContainer} key={index}>
+                                        <Text style={styles.hourText}>{`${formatTime(text)}`}</Text>
+                                      </View>)
+                            })}
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                    </ScrollView>
+                    <ScrollView style={{ margin:10, height:150,width:'50%', borderRadius:30 , backgroundColor:'#F9F9F9'}}>
+                    <View style={{justifyContent:'center', alignItems:'center'}}>
+                    {
+                      selectedRoutine.days.map((day, index) => (<Text key={index} style={{width:60,fontSize:24 , fontFamily:'Montserrat-regular',}}>{day.substring(0,3)}</Text>))
+                    }
+                    </View>
+                    </ScrollView>
+                    </View>
+      
+                  </View>
+                  <Button label="publish 💞" style={styles.uploadbutton} labelStyle={styles.buttonText} onPress={handleUploadRoutine} />
+                  <Button
+                    style={styles.button}
+                    labelStyle={styles.buttonText}
+                    label="delete routine"
+                    onPress={() => handleDeleteRoutine(selectedRoutine)}
+                    
+                  />
+                </View>
+              </View>
+              </KeyboardAvoidingView>
+            </Modal>
+        // <Modal
+        //   visible={isRoutineModalVisible}
+        //   onRequestClose={() => setIsRoutineModalVisible(false)}
+        //   animationType="slide"
+        //   transparent
+        // >
+        //   <View
+        //     style={{
+        //       flex: 1,
+        //       justifyContent: "center",
+        //       alignItems: "center",
+        //       backgroundColor: Colors.black70,
+        //     }}
+        //   >
+        //     <TouchableOpacity
+        //       style={{ position: "absolute", top: 10, right: 10 }}
+        //       onPress={() => setIsRoutineModalVisible(false)}
+        //     >
+        //       <MaterialCommunityIcons
+        //         name="close"
+        //         size={24}
+        //         color={Colors.grey10}
+        //       />
+        //     </TouchableOpacity>
+        //     <View
+        //       style={{
+        //         width: "80%",
+        //         backgroundColor: Colors.white,
+        //         borderRadius: 10,
+        //         padding: 20,
+        //       }}
+        //     >
+        //       <Text style={[Typography.text50, { marginBottom: 20 }]}>
+        //         Routine Details
+        //       </Text>
+        //       <Text>Title: {selectedRoutine.title}</Text>
+        //       <Text>Products: {selectedRoutine.products}</Text>
+        //       <Text>Notes: {selectedRoutine.notes}</Text>
+        //       <Text>
+        //         {selectedRoutine.days && (
+        //           <Text>Days: {selectedRoutine.days.join(", ")}</Text>
+        //         )}
+        //       </Text>
+        //       {selectedRoutine.hours && (
+        //         <Text>Hours: {selectedRoutine.hours.map(((hour, index) => {
+        //           const text = new Date(hour);
+        //           return <Text key={index}>{formatTime(text)} </Text>}))}</Text>
+        //       )}
+        //       <Button label="Export" onPress={handleExportRoutine} />
+        //       <Button label="Upload" onPress={handleUploadRoutine} />
+        //       <Button
+        //         label="Delete"
+        //         onPress={() => handleDeleteRoutine(selectedRoutine)}
+        //         backgroundColor={"#F38C79"}
+        //       />
+        //     </View>
+        //   </View>
+        // </Modal>
 
 
 
