@@ -1,18 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
+
 import React, { useCallback , useState, useEffect } from 'react'
-import { Button, StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import Login from './screens/Login';
 import Signup from './screens/Signup';
-
 import ForgotPassword from './screens/ForgotPassword';
-import ResetPassword from './screens/ResetPassword';
-import ConfirmEmail from './screens/ConfirmEmail';
 import Home from './screens/Home';
 import Routines from './screens/Routines';
 import Settings from './screens/Settings';
 import Explore from './screens/Explore';
+import LoadingScreen from './screens/LoadingScreen';
 
 import { NavigationContainer , DefaultTheme} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -20,14 +17,11 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
-
 
 
 const AuthenticationStack = () => {
@@ -62,10 +56,10 @@ const HomeStack = () => {
       tabBarInactiveTintColor: '#FEA89732',
     })}
   >
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Routines" component={Routines} />
-      <Tab.Screen name="Explore" component={Explore} />
-      <Tab.Screen name="Settings" component={Settings} />
+      <Tab.Screen options={{ headerShown: false }}  name="Home" component={Home} />
+      <Tab.Screen options={{ headerShown: false }} name="Routines" component={Routines} />
+      <Tab.Screen options={{ headerShown: false }} name="Explore" component={Explore} />
+      <Tab.Screen options={{ headerShown: false }} name="Settings" component={Settings} />
     </Tab.Navigator>
   );
 };
@@ -74,15 +68,20 @@ const HomeStack = () => {
 
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [userSignedIn, setUserSignedIn] = useState(false);
 
   useEffect(() => {
+    setTimeout(() => {
+      setIsLoggedIn(true);
+      setIsLoading(false);
+    }, 3000);
+    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUserSignedIn(!!user);
     });
-
-    // Clean up the listener when the component unmounts
     return () => unsubscribe();
   }, []);
 
@@ -113,11 +112,16 @@ export default function App() {
   }
 
   SplashScreen.preventAutoHideAsync(); 
-  return (
-    <NavigationContainer theme={MyTheme}>
-      {userSignedIn ? <HomeStack /> : <AuthenticationStack />}
-    </NavigationContainer>
-  );
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+    return (
+      <NavigationContainer theme={MyTheme}>
+        {userSignedIn ? <HomeStack /> : <AuthenticationStack />}
+      </NavigationContainer>
+    );
+  
+
 }
 
 

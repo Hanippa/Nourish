@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, FlatList, StyleSheet, Share ,TouchableOpacity ,  KeyboardAvoidingView} from "react-native";
 import {firestore , app} from "../firebase"
-import { getAuth , onAuthStateChanged} from "firebase/auth";
-import { addDoc ,collection , doc , setDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { collection , doc , setDoc } from "firebase/firestore";
 import {
   Card,
   Colors,
-  Typography,
   Modal,
   TextField,
   Button,
@@ -82,17 +81,6 @@ const Routines = () => {
   useEffect(() => {
     const auth = getAuth(app)
     user = auth.currentUser;
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/auth.user
-        const uid = user.uid;
-        // ...
-      } else {
-        // User is signed out
-        // ...
-      }
-    });
     loadRoutines();
   }, []);
 
@@ -291,6 +279,7 @@ const Routines = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white", position: "relative" }}>
+      <Text style={{fontFamily:'Montserrat-regular', fontSize:30 , width:'100%' , textAlign:'center', marginTop:80}}>personal routines 🌈</Text>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -682,66 +671,6 @@ const Routines = () => {
               </View>
               </KeyboardAvoidingView>
             </Modal>
-        // <Modal
-        //   visible={isRoutineModalVisible}
-        //   onRequestClose={() => setIsRoutineModalVisible(false)}
-        //   animationType="slide"
-        //   transparent
-        // >
-        //   <View
-        //     style={{
-        //       flex: 1,
-        //       justifyContent: "center",
-        //       alignItems: "center",
-        //       backgroundColor: Colors.black70,
-        //     }}
-        //   >
-        //     <TouchableOpacity
-        //       style={{ position: "absolute", top: 10, right: 10 }}
-        //       onPress={() => setIsRoutineModalVisible(false)}
-        //     >
-        //       <MaterialCommunityIcons
-        //         name="close"
-        //         size={24}
-        //         color={Colors.grey10}
-        //       />
-        //     </TouchableOpacity>
-        //     <View
-        //       style={{
-        //         width: "80%",
-        //         backgroundColor: Colors.white,
-        //         borderRadius: 10,
-        //         padding: 20,
-        //       }}
-        //     >
-        //       <Text style={[Typography.text50, { marginBottom: 20 }]}>
-        //         Routine Details
-        //       </Text>
-        //       <Text>Title: {selectedRoutine.title}</Text>
-        //       <Text>Products: {selectedRoutine.products}</Text>
-        //       <Text>Notes: {selectedRoutine.notes}</Text>
-        //       <Text>
-        //         {selectedRoutine.days && (
-        //           <Text>Days: {selectedRoutine.days.join(", ")}</Text>
-        //         )}
-        //       </Text>
-        //       {selectedRoutine.hours && (
-        //         <Text>Hours: {selectedRoutine.hours.map(((hour, index) => {
-        //           const text = new Date(hour);
-        //           return <Text key={index}>{formatTime(text)} </Text>}))}</Text>
-        //       )}
-        //       <Button label="Export" onPress={handleExportRoutine} />
-        //       <Button label="Upload" onPress={handleUploadRoutine} />
-        //       <Button
-        //         label="Delete"
-        //         onPress={() => handleDeleteRoutine(selectedRoutine)}
-        //         backgroundColor={"#F38C79"}
-        //       />
-        //     </View>
-        //   </View>
-        // </Modal>
-
-
 
 
 

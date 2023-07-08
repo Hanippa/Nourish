@@ -1,9 +1,8 @@
-import {Text , View , Button, Image ,  KeyboardAvoidingView , ScrollView} from 'react-native'
-import React, { useEffect , useState } from 'react';
-import { StyleSheet , Alert } from 'react-native';
+import {Text , View , Image ,  KeyboardAvoidingView , ScrollView} from 'react-native'
+import { StyleSheet } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
-import {useForm , Controller} from 'react-hook-form'
+import {useForm } from 'react-hook-form'
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
  
@@ -16,11 +15,9 @@ const ForgotPassword = (props) => {
     sendPasswordResetEmail(auth, data.email)
     .then(() => {
       console.log('Password reset email sent to:', data.email);
-      // You can show a success message or navigate to a confirmation screen
     })
     .catch((error) => {
       console.log('Error sending password reset email:', error);
-      // You can show an error message to the user
     });
   };
 
