@@ -91,7 +91,7 @@ user = auth.currentUser;
     
     <View  style={ { flex: 1, backgroundColor: "white", position: "relative" }} >
       
-            <Text style={{fontFamily:'Montserrat-regular', fontSize:27 , width:'100%' , textAlign:'center', marginTop:80}}>hi {user ? `${user.displayName}` : 'love'}, take care 🤗 </Text>
+            <Text style={{fontFamily:'Montserrat-regular', fontSize:27 , width:'100%' , textAlign:'center', marginTop:20}}>hi {user ? `${user.displayName}` : 'love'}, take care 🤗 </Text>
    
 
     <Image style={{width:50, height: 36,position:'absolute' ,top:320 , left:20 , zIndex:0}} source={require('../assets/illustrations/bird-2.png')}/>

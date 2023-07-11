@@ -279,7 +279,7 @@ const Routines = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white", position: "relative" }}>
-      <Text style={{fontFamily:'Montserrat-regular', fontSize:30 , width:'100%' , textAlign:'center', marginTop:80}}>personal routines 🌈</Text>
+      <Text style={{fontFamily:'Montserrat-regular', fontSize:30 , width:'100%' , textAlign:'center', marginTop:20}}>personal routines 🌈</Text>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,

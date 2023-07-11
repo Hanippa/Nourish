@@ -396,7 +396,7 @@ const Explore = () => {
 
   return (
     <View style={[styles.container , { flex: 1, backgroundColor: "white", position: "relative" }]}>
-       <Text style={{fontFamily:'Montserrat-regular', fontSize:30 , width:'100%' , textAlign:'center', marginTop:50 , marginBottom:30}}>community 💕</Text>
+       <Text style={{fontFamily:'Montserrat-regular', fontSize:30 , width:'100%' , textAlign:'center', marginTop:0 , marginBottom:30}}>community 💕</Text>
       <FlatList
         data={routines}
         renderItem={renderRoutineItem}
