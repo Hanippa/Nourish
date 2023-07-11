@@ -210,13 +210,13 @@ const Explore = () => {
                         {(
                           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                             {
-
-                            routine.hours.map((hour , index) => {
-                                        const text = new Date(hour.toDate());
-                                        return (<View style={styles.hourContainer} key={index}>
-                                        <Text style={styles.hourText}>{`${formatTime(text)}`}</Text>
-                                      </View>)
-                            })}
+                            ([...routine.hours]).map((hour , index) => {
+                              const text =  typeof(hour) === 'string' ? new Date(hour) : new Date(hour.toDate())
+                              return (<View style={styles.hourContainer} key={index}>
+                              <Text style={styles.hourText}>{`${formatTime(text)}`}</Text>
+                            </View>)
+                  })
+}
                           </View>
                         )}
                       </View>

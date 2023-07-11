@@ -88,19 +88,20 @@ user = auth.currentUser;
 
   return (
     
-    <View>
+    
+    <View  style={ { flex: 1, backgroundColor: "white", position: "relative" }} >
       
-            <Text style={{fontFamily:'Montserrat-regular', fontSize:27 , width:'100%' , textAlign:'center', marginTop:100}}>hi {user ? `${user.displayName}` : 'love'}, take care 🤗 </Text>
+            <Text style={{fontFamily:'Montserrat-regular', fontSize:27 , width:'100%' , textAlign:'center', marginTop:80}}>hi {user ? `${user.displayName}` : 'love'}, take care 🤗 </Text>
    
-    <ScrollView contentContainerStyle={styles.container}>
-    <Image style={{width:50, height: 36,position:'absolute' ,top:200 , left:20 , zIndex:3}} source={require('../assets/illustrations/bird-2.png')}/>
-    <Image style={{  position:'absolute' , bottom:200 , right:20 , zIndex:3}} source={require('../assets/illustrations/bird-1.png')}/>
-      <View style={styles.containerColumn}>
+
+    <Image style={{width:50, height: 36,position:'absolute' ,top:320 , left:20 , zIndex:0}} source={require('../assets/illustrations/bird-2.png')}/>
+    <Image style={{  position:'absolute' , bottom:230 , right:20 , zIndex:0}} source={require('../assets/illustrations/bird-1.png')}/>
 
 
 
 
 
+<ScrollView>
       <Card
       style={styles.card}
       enableShadow={false}
@@ -172,6 +173,9 @@ user = auth.currentUser;
     </Card>
 
 
+
+
+
 <Card
       style={styles.card}
       enableShadow={false}
@@ -228,6 +232,11 @@ user = auth.currentUser;
 
           </Card>
     </Card>
+
+
+
+
+
 
 
     
@@ -292,12 +301,13 @@ user = auth.currentUser;
     </Card>
 
 
-
-
-
-      </View>
     </ScrollView>
-    <TouchableOpacity
+
+
+
+
+      
+      <TouchableOpacity
         style={{
           position: "absolute",
           bottom: 20,
@@ -316,7 +326,10 @@ user = auth.currentUser;
       > 
         <MaterialCommunityIcons name="refresh" size={24} color='white' />
       </TouchableOpacity>
+
+
     </View>
+    
   );
 };
 
@@ -336,13 +349,6 @@ const styles = StyleSheet.create({
     height:140 ,
     borderRadius:40
  },
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 20,
-  },
   caption: {
     fontSize: 20,
     fontWeight: 'bold',
